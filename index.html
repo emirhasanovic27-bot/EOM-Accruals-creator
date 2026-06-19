@@ -189,7 +189,7 @@
     'Bill Code': ['Bill code'],
     'Bill Rate': ['Bill rate']
   };
-  const ENG_COLS = ['Projected Engagement Relationship','Engagement Relationship'];
+
 
   // --- RFC4180-ish CSV parser ---
   function parseCSV(text) {
@@ -251,10 +251,8 @@
     if (missing.length) {
       throw new Error('Missing expected column(s): ' + missing.join(', '));
     }
-    const engIdx = findIdx(header, ENG_COLS); // -1 ok -> default
-
     const out = [OUT_HEADER.slice()];
-    let engDefaulted = 0;
+    let payrollCount = 0, icCount = 0;
 
     for (let r = 1; r < rows.length; r++) {
       const row = rows[r];
@@ -269,8 +267,9 @@
       const br = parseFloat(billRateRaw);
       const billing = (isFinite(th) && isFinite(br)) ? round2(th * br) : '';
 
-      let eng = engIdx >= 0 ? get(engIdx).trim() : '';
-      if (!eng) { eng = 'Independent Contractor'; engDefaulted++; }
+      const agency = get(idx['Agency']).trim();
+      const eng = agency ? 'Payroll' : 'Independent Contractor';
+      if (agency) payrollCount++; else icCount++;
 
       out.push([
         get(idx['Date']),
@@ -289,7 +288,7 @@
         eng
       ]);
     }
-    return { out, dataRows: out.length - 1, engDefaulted, hadEngCol: engIdx >= 0 };
+    return { out, dataRows: out.length - 1, payrollCount, icCount };
   }
 
   function outName(inName) {
@@ -324,11 +323,9 @@
       previewRows.map(r => '<tr>' + r.map(c => '<td>' + escapeHtml(c) + '</td>').join('') + '</tr>').join('') +
       '</tbody></table></div>';
 
-    const warn = !res.hadEngCol
-      ? '<div class="warn">No engagement column found in this report — all ' + res.engDefaulted + ' row(s) set to “Independent Contractor”.</div>'
-      : (res.engDefaulted > 0
-          ? '<div class="warn">' + res.engDefaulted + ' row(s) had a blank engagement value — set to “Independent Contractor”.</div>'
-          : '');
+    const warn = '<div class="warn">Engagement Relationship set from Agency: '
+      + res.payrollCount + ' Payroll (Agency filled), '
+      + res.icCount + ' Independent Contractor (Agency empty).</div>';
 
     resultEl.className = 'result show';
     resultEl.innerHTML =
