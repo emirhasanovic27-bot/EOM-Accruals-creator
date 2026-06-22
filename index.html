@@ -49,51 +49,10 @@
   h1 .arrow { color: var(--accent); font-weight: 400; }
   .sub { color: var(--ink-dim); font-size: 14px; margin-top: 8px; max-width: 60ch; }
 
-  .program-row {
-    margin-top: 24px;
-    padding: 16px 18px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .program-label {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--accent);
-    flex-shrink: 0;
-  }
-  #program {
-    font-family: var(--sans);
-    font-size: 13px;
-    color: var(--ink);
-    background: var(--panel-2);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 9px 12px;
-    cursor: pointer;
-    flex: 1;
-    min-width: 240px;
-  }
-  #program:focus { outline: none; border-color: var(--accent); }
-  .program-hint {
-    width: 100%;
-    color: var(--gold);
-    font-size: 12.5px;
-    font-family: var(--mono);
-    display: none;
-  }
-  .program-hint.show { display: block; }
-
   .drop {
     display: block;
     width: 100%;
-    margin-top: 12px;
+    margin-top: 24px;
     border: 1.5px dashed var(--line);
     border-radius: 14px;
     background: var(--panel);
@@ -188,15 +147,6 @@
     <p class="sub">Drop a downloaded timesheet report and get the standardized Accruals report back. Handles both report layouts automatically. Everything runs in your browser — nothing is uploaded.</p>
   </header>
 
-  <div class="program-row">
-    <label for="program" class="program-label">Program</label>
-    <select id="program">
-      <option value="standard">Standard — uses Bill code &amp; Bill rate from the file</option>
-      <option value="gtnp">GTNP — Bill code from G-Code, Bill rate from SOW table</option>
-    </select>
-    <div class="program-hint" id="programHint"></div>
-  </div>
-
   <label class="drop" id="drop">
     <div class="ico">↑</div>
     <div class="big">Drop a CSV here, or click to choose</div>
@@ -239,25 +189,6 @@
     'Bill Code': ['Bill code'],
     'Bill Rate': ['Bill rate']
   };
-
-  // GTNP layout: no Bill code / Bill rate columns. Bill Code comes from G-Code,
-  // Bill Rate is looked up from the embedded SOW table below.
-  const MAP_GTNP = {
-    'Date': ['Date'],
-    'Team': ['Team'],
-    'Freelancer Name': ['Freelancer name'],
-    'Username': ['Username'],
-    'Agency': ['Agency'],
-    'Contract': ['Contract'],
-    'Type': ['Type'],
-    'Total Hours': ['Total hours'],
-    'Manual Hours': ['Manual hours'],
-    'Total Charges': ['Total charges'],
-    'Bill Code': ['G-Code']  // G-Code becomes the Bill Code
-  };
-
-  // SOW 2026 rate table (G-Code -> billRateValue 2026). Keys are lowercased.
-  const SOW_RATES = {"ar-1":9.04,"ar-1-s":11.3,"ar-2":11.67,"ar-2-s":14.58,"ar-3":12.53,"ar-3-s":15.66,"ca-1":13.71,"ca-1-s":17.15,"ca-2":15.28,"ca-2-s":19.1,"ca-3":21.93,"ca-3-s":27.43,"cl-1":38.77,"cl-2":40.82,"cl-3":50.06,"cs-1":12.04,"cs-1-s":15.06,"cs-2":13.69,"cs-2-s":17.12,"cs-3":17.6,"cs-3-s":22.01,"de-1":20.36,"de-1-s":25.44,"de-2":22.16,"de-2-s":27.7,"de-3":26.22,"de-3-s":32.77,"en-1":5.81,"en-1-s":7.26,"en-2":6.16,"en-2-s":7.71,"en-3":8.65,"en-3-s":10.82,"en11-1":20.84,"en11-1-s":26.05,"en11-2":20.84,"en11-2-s":26.05,"en11-3":20.84,"en11-3-s":26.05,"es-419-1":8.04,"es-419-1-s":10.06,"es-419-2":10.32,"es-419-2-s":12.9,"es-419-3":14.21,"es-419-3-s":17.76,"fi-1":20.64,"fi-1-s":25.8,"fi-2":24.01,"fi-2-s":30.02,"fi-3":28.54,"fi-3-s":35.67,"fr-1":10.4,"fr-1-s":13.0,"fr-2":23.76,"fr-2-s":29.7,"fr-3":24.07,"fr-3-s":30.08,"hu-1":10.12,"hu-1-s":12.65,"hu-2":14.63,"hu-2-s":18.28,"hu-3":15.52,"hu-3-s":19.39,"id-1":6.83,"id-1-s":8.54,"id-2":7.85,"id-2-s":9.82,"id-3":9.91,"id-3-s":12.39,"it-1":17.51,"it-1-s":21.89,"it-2":20.17,"it-2-s":25.21,"it-3":24.22,"it-3-s":30.28,"iw-1":20.17,"iw-1-s":25.21,"iw-2":23.48,"iw-2-s":29.35,"iw-3":27.69,"iw-3-s":34.62,"ja-1":21.67,"ja-1-s":27.1,"ja-2":25.28,"ja-2-s":31.61,"ja-3":27.69,"ja-3-s":34.62,"ko-1":18.84,"ko-1-s":23.55,"ko-2":19.78,"ko-2-s":24.74,"ko-3":22.44,"ko-3-s":28.06,"ms-1":7.6,"ms-1-s":9.5,"ms-2":8.66,"ms-2-s":10.83,"ms-3":12.04,"ms-3-s":15.06,"nl-1":18.87,"nl-1-s":23.58,"nl-2":22.21,"nl-2-s":27.76,"nl-3":28.1,"nl-3-s":35.12,"no-1":28.43,"no-1-s":35.54,"no-2":32.03,"no-2-s":40.04,"no-3":34.69,"no-3-s":43.37,"pl-1":12.05,"pl-1-s":15.07,"pl-2":17.75,"pl-2-s":22.19,"pl-3":19.7,"pl-3-s":24.62,"pm-1":82.82,"pt-1":14.69,"pt-1-s":18.36,"pt-2":15.81,"pt-2-s":19.76,"pt-3":16.89,"pt-3-s":21.12,"ru-1":10.02,"ru-1-s":12.52,"ru-2":12.72,"ru-2-s":15.9,"ru-3":14.34,"ru-3-s":17.92,"sv-1":25.61,"sv-1-s":32.01,"sv-2":29.57,"sv-2-s":36.96,"sv-3":30.79,"sv-3-s":38.48,"th-1":9.11,"th-1-s":11.39,"th-2":10.34,"th-2-s":12.93,"th-3":18.63,"th-3-s":23.29,"tr-1":9.3,"tr-1-s":11.63,"tr-2":10.25,"tr-2-s":12.81,"tr-3":12.86,"tr-3-s":16.08,"uk-1":7.94,"uk-1-s":9.92,"uk-2":9.52,"uk-2-s":11.91,"uk-3":13.09,"uk-3-s":16.37,"vi-1":6.78,"vi-1-s":8.47,"vi-2":9.16,"vi-2-s":11.43,"vi-3":9.46,"vi-3-s":11.82,"zh-cn-1":21.14,"zh-cn-1-s":26.43,"zh-cn-2":19.24,"zh-cn-2-s":24.06,"zh-cn-3":19.3,"zh-cn-3-s":24.12,"zh-tw-1":21.14,"zh-tw-1-s":26.42,"zh-tw-2":19.24,"zh-tw-2-s":24.06,"zh-tw-3":19.3,"zh-tw-3-s":24.13,"yl-0":0.0,"su-1":0.0};
 
 
   // --- RFC4180-ish CSV parser ---
@@ -305,30 +236,23 @@
     return (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2);
   }
 
-  function convert(rows, program) {
+  function convert(rows) {
     if (!rows.length) throw new Error('File is empty.');
     const header = rows[0];
-    const isGTNP = program === 'gtnp';
-    const map = isGTNP ? MAP_GTNP : MAP;
 
     // resolve indices
     const idx = {};
     const missing = [];
-    for (const out in map) {
-      const i = findIdx(header, map[out]);
+    for (const out in MAP) {
+      const i = findIdx(header, MAP[out]);
       idx[out] = i;
-      if (i === -1) missing.push(map[out][0]);
+      if (i === -1) missing.push(MAP[out][0]);
     }
     if (missing.length) {
-      const hint = isGTNP
-        ? ' (GTNP mode expects a "G-Code" column — is this actually a GTNP file?)'
-        : ' (this file is missing Bill code / Bill rate — if it has a G-Code column, pick the GTNP program instead.)';
-      throw new Error('Missing expected column(s): ' + missing.join(', ') + hint);
+      throw new Error('Missing expected column(s): ' + missing.join(', '));
     }
     const out = [OUT_HEADER.slice()];
     let payrollCount = 0, icCount = 0;
-    let unmatchedRows = 0;
-    const unmatchedCodes = {};
 
     for (let r = 1; r < rows.length; r++) {
       const row = rows[r];
@@ -339,21 +263,7 @@
 
       const totalHoursRaw = get(idx['Total Hours']).trim();
       const billCode = get(idx['Bill Code']).trim();
-
-      let billRateRaw;
-      if (isGTNP) {
-        // look up rate from SOW table by G-Code
-        const rate = SOW_RATES[billCode.toLowerCase()];
-        if (rate === undefined) {
-          billRateRaw = '';
-          unmatchedRows++;
-          if (billCode) unmatchedCodes[billCode] = (unmatchedCodes[billCode] || 0) + 1;
-        } else {
-          billRateRaw = String(rate);
-        }
-      } else {
-        billRateRaw = get(idx['Bill Rate']).trim();
-      }
+      const billRateRaw = get(idx['Bill Rate']).trim();
 
       const th = parseFloat(totalHoursRaw);
       const br = parseFloat(billRateRaw);
@@ -380,8 +290,7 @@
         eng
       ]);
     }
-    return { out, dataRows: out.length - 1, payrollCount, icCount,
-             isGTNP, unmatchedRows, unmatchedCodes };
+    return { out, dataRows: out.length - 1, payrollCount, icCount };
   }
 
   function outName(inName) {
@@ -416,23 +325,9 @@
       previewRows.map(r => '<tr>' + r.map(c => '<td>' + escapeHtml(c) + '</td>').join('') + '</tr>').join('') +
       '</tbody></table></div>';
 
-    const engWarn = '<div class="warn">Engagement Relationship set from Agency: '
+    const warn = '<div class="warn">Engagement Relationship set from Agency: '
       + res.payrollCount + ' Payroll (Agency filled), '
       + res.icCount + ' Independent Contractor (Agency empty).</div>';
-
-    let gtnpWarn = '';
-    if (res.isGTNP) {
-      const codes = Object.keys(res.unmatchedCodes);
-      if (res.unmatchedRows > 0) {
-        const list = codes.map(c => c + ' (' + res.unmatchedCodes[c] + ')').join(', ');
-        gtnpWarn = '<div class="warn">GTNP: ' + res.unmatchedRows
-          + ' row(s) had a G-Code not in the SOW rate table — Bill Rate &amp; Total Client Billing left blank for these. Codes: '
-          + escapeHtml(list) + '</div>';
-      } else {
-        gtnpWarn = '<div class="warn">GTNP: all G-Codes matched the SOW rate table. Bill Rate looked up from G-Code.</div>';
-      }
-    }
-    const warn = gtnpWarn + engWarn;
 
     resultEl.className = 'result show';
     resultEl.innerHTML =
@@ -453,28 +348,13 @@
     });
   }
 
-  const programSel = document.getElementById('program');
-  const programHint = document.getElementById('programHint');
-
-  function updateHint() {
-    if (programSel.value === 'gtnp') {
-      programHint.textContent = 'GTNP: Bill Code = G-Code from the file; Bill Rate looked up from the built-in SOW 2026 table.';
-      programHint.classList.add('show');
-    } else {
-      programHint.classList.remove('show');
-    }
-  }
-  programSel.addEventListener('change', updateHint);
-  updateHint();
-
   function handleFile(file) {
     if (!file) return;
-    const program = programSel.value;
     const reader = new FileReader();
     reader.onload = function (e) {
       try {
         const rows = parseCSV(e.target.result);
-        const res = convert(rows, program);
+        const res = convert(rows);
         showSuccess(file.name, res);
       } catch (err) {
         showError(file.name, err.message || String(err));
